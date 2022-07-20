@@ -2,15 +2,9 @@ const mongoose = require('mongoose');
 
 const connectionStringURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/social-network';
 
-const main = async () => {
-    try {
-        await mongoose.connect(connectionStringURI);
-        console.log('Mongoose connection successfull...');
-    } catch (err) {
-        console.log(err.message);
-    }
+const connection = async () => {
+    await mongoose.connect(connectionStringURI);
+    console.log('Mongoose connection successfull...');
 }
 
-main();
-
-module.exports = mongoose;
+module.exports = connection;
