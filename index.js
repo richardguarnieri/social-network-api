@@ -8,6 +8,8 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // express middleware
+app.use(express.urlencoded()); // parses incoming urlencoded payloads - strings / arrays
+app.use(express.json()); // parses incoming json
 app.use(routes)
 
 // starts mongoose connection and if successfull, starts the express web server
