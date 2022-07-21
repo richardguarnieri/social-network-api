@@ -7,6 +7,7 @@ const connection = require('./config/connection')
 const app = express();
 const port = process.env.PORT || 3001;
 
+// express middleware
 app.use(routes)
 
 // starts mongoose connection and if successfull, starts the express web server
