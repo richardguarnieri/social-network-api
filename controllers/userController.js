@@ -42,11 +42,6 @@ const updateUser = async (req, res) => {
         const { userId } = req.params;
         if (userId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${userId} is not a valid ID!`})}
         const { username, email } = req.body;
-        // const user = await User.findOneAndUpdate(
-        //     {_id: id},
-        //     {$set: {username, email}},
-        //     {runValidators: true, new: true}
-        // );
         const user = await User.findOne({_id: userId});
         if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})}
         if (username) {user.username = username};
@@ -89,14 +84,28 @@ const postUserFriend = async (req, res) => {
     } catch (err) {
         res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
     }
-}
+};
 
 // DELETE to remove a friend from a user's friend list
 const deleteUserFriend = async (req, res) => {
-    
-}
-
+    try {
+        const { userId, friendId } = req.params;
+        if (userId.length !== 24 || friendId.length !== 24) {return res.status(400).json({success: false, message: `Provided IDs are not a valid IDs!`})}
+        const user = await User.findOne({_id: userId});
+        if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})}
+        const friend = await User.findOne({_id: friendId});
+        if (!friend) {return res.status(400).json({success: false, message: `User with ID ${friendId} does not exist!`})}
+        // check if friendId is already included in the user's friend list
+        if (!user.friends.includes(friendId)) {return res.status(400).json({success: false, message: `User ID ${friendId} is not friends with User ID ${userId}!`})}
+        // filter out the friendId from the user.friends array - toString() needed to convert from ObjectId to String to allow comparison
+        user.friends = user.friends.filter(friend => friend.toString() !== friendId);
+        user.save();
+        res.status(200).json({success: true, message: `User ID ${friendId} has been removed from User ID ${userId} friends!`})
+    } catch (err) {
+        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+    }
+};
 
 module.exports = {
     getUsers, getUser, postUser, updateUser, deleteUser, postUserFriend, deleteUserFriend
-}
+};
