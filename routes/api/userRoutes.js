@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getUsers, postUser } = require('./../../controllers/userController');
+const { getUsers, getUser, postUser } = require('./../../controllers/userController');
 
 // /api/users
 router.route('/')
@@ -9,10 +9,6 @@ router.route('/')
 
 // /api/users/:id
 router.route('/:id')
-    .get(async (req, res) => {
-        const { id } = req.params;
-        const users = await User.find({ _id: id});
-        res.send(users)
-    })
+    .get(getUser)
 
 module.exports = router;

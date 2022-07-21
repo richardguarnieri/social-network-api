@@ -11,7 +11,7 @@ const getUsers = async (req, res) => {
 }
 
 // GET one user
-const getOneUser = async (req, res) => {
+const getUser = async (req, res) => {
     try {
         const { id } = req.params;
         const user = await User.find({_id: id});
@@ -39,5 +39,5 @@ const postUser = async (req, res) => {
 }
 
 module.exports = {
-    getUsers, getOneUser, postUser
+    getUsers, getUser, postUser
 }
