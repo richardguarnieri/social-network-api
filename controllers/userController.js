@@ -14,7 +14,7 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const { id } = req.params;
-        const user = await User.find({_id: id});
+        const user = await User.find({_id: id}).populate('friends');
         res.status(200).json(user);
     } catch (err) {
         res.status(400).json({success: false, message: 'something went wrong...', error: err.message})

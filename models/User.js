@@ -21,11 +21,11 @@ const userSchema = new mongoose.Schema({
     },
     thoughts: [{
         type: mongoose.Schema.Types.ObjectId, 
-        ref: 'thought',
+        ref: 'Thought',
     }],
     friends: [{
         type: mongoose.Schema.Types.ObjectId, 
-        ref: this,
+        ref: 'User',
     }]
 })
 
