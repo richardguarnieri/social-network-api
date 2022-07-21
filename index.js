@@ -1,13 +1,13 @@
 const express = require('express');
+const routes = require('./routes');
+
 const connection = require('./config/connection')
 
 // creates an express application
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.get('/', (req, res) => {
-    res.send('hello world')
-})
+app.use(routes)
 
 // starts mongoose connection and if successfull, starts the express web server
 const init = async () => {
