@@ -42,6 +42,7 @@ const updateUser = async (req, res) => {
         const { userId } = req.params;
         if (userId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${userId} is not a valid ID!`})}
         const { username, email } = req.body;
+        if (!username && !email) {return res.status(400).json({success: false, message: `Empty request!`})}
         const user = await User.findOne({_id: userId});
         if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})}
         if (username) {user.username = username};
