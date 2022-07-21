@@ -1,13 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const User = require('./../../models/User');
+const { getUsers } = require('./../../controllers/userController');
 
 // /api/users
 router.route('/')
-    .get(async (req, res) => {
-        const users = await User.find();
-        res.send(users)
-    })
+    .get(getUsers)
 
 // /api/users/:id
 router.route('/:id')
