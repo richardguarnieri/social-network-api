@@ -1,6 +1,27 @@
 const mongoose = require('mongoose');
 
-// define Schema
+// define reactionSchema
+const reactionSchema = new mongoose.Schema({
+    reactionId: {
+        type: mongoose.ObjectID,
+        default: new mongoose.ObjectID(),
+    },
+    reactionBody: {
+        type: String,
+        required: true,
+        maxLength: 280,
+    },
+    username: {
+        type: String,
+        required: true,
+    },
+    createdAt: {
+        type: Date,
+        default: new Date(),
+    },
+});
+
+// define thoughtSchema
 const thoughtSchema = new mongoose.Schema({
     thoughtText: {
         type: String,
@@ -16,7 +37,7 @@ const thoughtSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    reactions: []
+    reactions: [reactionSchema]
 });
 
 // virtuals
