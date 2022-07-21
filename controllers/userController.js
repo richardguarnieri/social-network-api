@@ -30,7 +30,7 @@ const postUser = async (req, res) => {
     try {
         const { username, email, thoughts, friends } = req.body;
         const user = await User.create({username, email, thoughts, friends})
-        res.status(200).json({success: true, message: `${user} has been created!`})
+        res.status(200).json({success: true, message: `User with username: ${user.username} has been created!`})
     } catch (err) {
         res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
     }
