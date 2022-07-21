@@ -1,6 +1,5 @@
 const express = require('express');
 const routes = require('./routes');
-
 const connection = require('./config/connection')
 
 // creates an express application
@@ -22,6 +21,6 @@ const init = async () => {
     } catch (err) {
         console.log(err.message)
     }
-}
+};
 
 init();
