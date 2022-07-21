@@ -13,11 +13,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true,
         lowercase: true,
+        minLength: 12,
         validate: {
-            validator: function(email) {
-                return /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(email)
-            },
-            message: 'Please add a valid email address.'
+            validator: v => /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/.test(v),
+            message: props => `${props.value} is not a valid email address.`
         }
     },
     thoughts: [{
@@ -30,8 +29,13 @@ const userSchema = new mongoose.Schema({
     }]
 },
 {
-    versionKey: false
+    // versionKey: false
 })
+
+// virtuals
+userSchema.virtual('friendCount').get(function() {
+    return this.friends.length;
+});
 
 // define Model
 const User = mongoose.model('User', userSchema);
