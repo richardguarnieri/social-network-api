@@ -4,7 +4,7 @@ const connectionStringURI = process.env.MONGODB_URI || 'mongodb://localhost:2701
 
 const connection = async () => {
     await mongoose.connect(connectionStringURI);
-    console.log('Mongoose connection successfull...');
+    console.log('Mongoose connection successful...');
 }
 
 module.exports = connection;
