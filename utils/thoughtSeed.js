@@ -2,10 +2,11 @@ const { Thought } = require('./../models');
 
 const seedThoughts = async () => {
     await Thought.create(
-        {_id: '62d9733226bfdf20564153a1', thoughtText: 'thought text 1', username: 'example2'},
-        {_id: '62d9733226bfdf20564153a2', thoughtText: 'thought text 2', username: 'example3', reactions: {reactionBody: 'reaction body 1', username: 'example2'}},
-        {_id: '62d9733226bfdf20564153a3', thoughtText: 'thought text 3', username: 'example4', reactions: {reactionBody: 'reaction body 2', username: 'example3'}},
-        {_id: '62d9733226bfdf20564153a4', thoughtText: 'thought text 4', username: 'example5', reactions: {reactionBody: 'reaction body 3', username: 'example4'}},
+        {_id: '62d9733226bfdf20564153a1', thoughtText: 'A sledgehammer to crack a nut', username: 'richardguarnieri'},
+        {_id: '62d9733226bfdf20564153a2', thoughtText: 'The birds and the bees', username: 'kevinralo', reactions: {reactionBody: 'Oh, great!!!', username: 'camilazagal'}},
+        {_id: '62d9733226bfdf20564153a3', thoughtText: 'All things come to those who wait', username: 'daniellago', reactions: {reactionBody: 'Awesome!', username: 'camilazagal'}},
+        {_id: '62d9733226bfdf20564153a4', thoughtText: 'A skeleton in the closet', username: 'erendiramendoza', reactions: {reactionBody: 'I really liked this one!', username: 'kevinralo'}},
+        {_id: '62d9733226bfdf20564153a5', thoughtText: 'The road less travelled', username: 'camilazagal', reactions: {reactionBody: 'That was cool!', username: 'daniellago'}},
     )
 };
 
