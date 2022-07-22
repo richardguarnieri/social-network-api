@@ -75,10 +75,28 @@ const deleteThought = async(req, res) => {
 };
 
 // POST to create a reaction stored in a single thought's reactions array field
+const postThoughtReaction = async (req, res) => {
+    try {
+        const { thoughtId } = req.params;
+        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
+        const { reactionBody, username } = req.body;
+        if (!reactionBody || !username) {return res.status(400).json({success: false, message: `Empty request!`})}
+        const thought = await Thought.findOne({_id: thoughtId});
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        thought.reactions.push({
+            reactionBody,
+            username,
+        });
+        thought.save();
+        res.status(200).json({success: true, message: `Thought ID ${thoughtId} has been updated with a Reaction!`})
+    } catch (err) {
+        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+    }
+};
 
 // DELETE to pull and remove a reaction by the reaction's reactionId value
 
 
 module.exports = {
-    getThoughts, getThought, postThought, updateThought, deleteThought
+    getThoughts, getThought, postThought, updateThought, deleteThought, postThoughtReaction
 };
