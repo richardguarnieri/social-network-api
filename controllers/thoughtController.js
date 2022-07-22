@@ -29,6 +29,7 @@ const getThought = async (req, res) => {
 const postThought = async (req, res) => {
     try {
         const { thoughtText, userId } = req.body;
+        if (!thoughtText || !userId) {return res.status(400).json({success: false, message: `Empty / bad request!`})};
         if (userId.length !== 24) {return res.status(400).json({success: false, message: `Provided userId ${userId} is not a valid ID!`})};
         const user = await User.findOne({_id: userId});
         if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})};
@@ -40,6 +41,32 @@ const postThought = async (req, res) => {
     } catch (err) {
         res.status(500).json({success: false, message: 'something went wrong...', error: err.message})
     }
-}
+};
 
-module.exports = {getThoughts, getThought, postThought};
+// PUT to update a thought by its _id
+const updateThought = async (req, res) => {
+    try {
+        const { thoughtId } = req.params;
+        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
+        const { thoughtText } = req.body;
+        if (!thoughtText) {return res.status(400).json({success: false, message: `Empty request!`})}
+        const thought = await Thought.findOne({_id: thoughtId});
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        if (thoughtText) {thought.thoughtText = thoughtText};
+        thought.save()
+        res.status(200).json({success: true, message: `Thought with ID ${thoughtId} has been successfully updated!`})
+    } catch (err) {
+        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+    }
+};
+
+// DELETE to remove a thought by its _id
+
+// POST to create a reaction stored in a single thought's reactions array field
+
+// DELETE to pull and remove a reaction by the reaction's reactionId value
+
+
+module.exports = {
+    getThoughts, getThought, postThought, updateThought
+};
