@@ -6,7 +6,7 @@ const getThoughts = async (req, res) => {
         const thoughts = await Thought.find();
         res.status(200).json(thoughts);
     } catch (err) {
-        res.status(500).json({success: false, message: 'something went wrong...', error: err.message})
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -14,14 +14,11 @@ const getThoughts = async (req, res) => {
 const getThought = async (req, res) => {
     try {
         const { thoughtId } = req.params;
-        // validates if id parameter is a valid MongoDB ObjectId
-        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
         const thought = await Thought.findOne({_id: thoughtId});
-        // validates if thought is empty (null)
-        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})};
         res.status(200).json(thought);
     } catch (err) {
-        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
@@ -30,16 +27,15 @@ const postThought = async (req, res) => {
     try {
         const { thoughtText, userId } = req.body;
         if (!thoughtText || !userId) {return res.status(400).json({success: false, message: `Empty / bad request!`})};
-        if (userId.length !== 24) {return res.status(400).json({success: false, message: `Provided userId ${userId} is not a valid ID!`})};
         const user = await User.findOne({_id: userId});
         if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})};
         const thought = await Thought.create({thoughtText, username: user.username});
         // push thought _id to user.thoughts array
         user.thoughts.push(thought._id);
         user.save();
-        res.status(200).json({success: true, message: `Thought ID ${thought._id} has been created and added to User ID ${userId}!`});
+        res.status(200).json({success: true, message: `Thought ID ${thought._id} has been created and added to User ID ${userId}!`, thought, user});
     } catch (err) {
-        res.status(500).json({success: false, message: 'something went wrong...', error: err.message})
+        res.status(500).json({success: false, error: err.message});
     }
 };
 
@@ -47,16 +43,17 @@ const postThought = async (req, res) => {
 const updateThought = async (req, res) => {
     try {
         const { thoughtId } = req.params;
-        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
         const { thoughtText } = req.body;
-        if (!thoughtText) {return res.status(400).json({success: false, message: `Empty request!`})}
-        const thought = await Thought.findOne({_id: thoughtId});
-        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
-        if (thoughtText) {thought.thoughtText = thoughtText};
-        thought.save()
-        res.status(200).json({success: true, message: `Thought with ID ${thoughtId} has been successfully updated!`})
+        if (!thoughtText) {return res.status(400).json({success: false, message: `Empty request!`})};
+        const thought = await Thought.findOneAndUpdate(
+            {_id: thoughtId},
+            {$set: {thoughtText}},
+            {runValidators: true, new: true}
+        );
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})};
+        res.status(200).json({success: true, message: `Thought with ID ${thoughtId} has been successfully updated!`, thought});
     } catch (err) {
-        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
@@ -64,13 +61,17 @@ const updateThought = async (req, res) => {
 const deleteThought = async(req, res) => {
     try {
         const { thoughtId } = req.params;
-        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
-        const thought = await Thought.findOne({_id: thoughtId});
-        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
-        await Thought.deleteOne({_id: thoughtId});
-        res.status(200).json({success: true, message: `Thought with ID ${thoughtId} has been successfully deleted!`});
+        const thought = await Thought.findOneAndDelete({_id: thoughtId});
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})};
+        // deleting thought from Users
+        const user = await User.findOneAndUpdate(
+            {thoughts: thoughtId},
+            {$pull: {thoughts: thoughtId}},
+            {runValidators: true, new: true}
+        );
+        res.status(200).json({success: true, message: `Thought with ID ${thoughtId} has been successfully deleted!`, thought, user});
     } catch (err) {
-        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
@@ -78,20 +79,21 @@ const deleteThought = async(req, res) => {
 const postThoughtReaction = async (req, res) => {
     try {
         const { thoughtId } = req.params;
-        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
-        // ******* instead of username should be userId, so we can look for the user and grab the username - better mechanics *******
-        const { reactionBody, username } = req.body;
-        if (!reactionBody || !username) {return res.status(400).json({success: false, message: `Empty request!`})}
+        const { reactionBody, userId } = req.body;
+        if (!reactionBody || !userId) {return res.status(400).json({success: false, message: `Empty request!`})};
         const thought = await Thought.findOne({_id: thoughtId});
-        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})};
+        // check if an user exists with the userId parameter
+        const user = await User.findOne({_id: userId});
+        if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})};
         thought.reactions.push({
             reactionBody,
-            username,
+            username: user.username,
         });
         thought.save();
-        res.status(200).json({success: true, message: `Thought ID ${thoughtId} has been updated with a Reaction!`})
+        res.status(200).json({success: true, message: `Thought ID ${thoughtId} has been updated with a Reaction!`, thought});
     } catch (err) {
-        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
@@ -99,18 +101,17 @@ const postThoughtReaction = async (req, res) => {
 const deleteThoughtReaction = async (req, res) => {
     try {
         const { thoughtId, reactionId } = req.params;
-        if (thoughtId.length !== 24 || reactionId.length !== 24) {return res.status(400).json({success: false, message: `Provided IDs are not a valid IDs!`})}
         const thought = await Thought.findOne({_id: thoughtId});
-        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})};
         // check if reactionId is already included in the thought.reactions list - first have to map to extract the ids
         const thoughtReactionsArray = thought.reactions.map(el => el._id.toString());
-        if (!thoughtReactionsArray.includes(reactionId)) {return res.status(400).json({success: false, message: `Reaction ID ${reactionId} does not exist in Thought ID ${thoughtId}!`})}
+        if (!thoughtReactionsArray.includes(reactionId)) {return res.status(400).json({success: false, message: `Reaction ID ${reactionId} does not exist in Thought ID ${thoughtId}!`})};
         // filter out the reactionId from the thought.reactions array - toString() needed to convert from ObjectId to String to allow comparison
         thought.reactions = thought.reactions.filter(reaction => reaction._id.toString() !== reactionId);
         thought.save();
-        res.status(200).json({success: true, message: `Reaction ID ${reactionId} has been removed from Thought ID ${thoughtId}!`})
+        res.status(200).json({success: true, message: `Reaction ID ${reactionId} has been removed from Thought ID ${thoughtId}!`});
     } catch (err) {
-        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+        res.status(400).json({success: false, error: err.message});
     }
 };
 
