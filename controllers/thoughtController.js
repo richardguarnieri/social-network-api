@@ -61,6 +61,18 @@ const updateThought = async (req, res) => {
 };
 
 // DELETE to remove a thought by its _id
+const deleteThought = async(req, res) => {
+    try {
+        const { thoughtId } = req.params;
+        if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
+        const thought = await Thought.findOne({_id: thoughtId});
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        await Thought.deleteOne({_id: thoughtId});
+        res.status(200).json({success: true, message: `Thought with ID ${thoughtId} has been successfully deleted!`});
+    } catch (err) {
+        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+    }
+};
 
 // POST to create a reaction stored in a single thought's reactions array field
 
@@ -68,5 +80,5 @@ const updateThought = async (req, res) => {
 
 
 module.exports = {
-    getThoughts, getThought, postThought, updateThought
+    getThoughts, getThought, postThought, updateThought, deleteThought
 };

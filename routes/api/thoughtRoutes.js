@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getThoughts, getThought, postThought, updateThought } = require('./../../controllers/thoughtController')
+const { getThoughts, getThought, postThought, updateThought, deleteThought } = require('./../../controllers/thoughtController')
 
 // /api/thoughts
 router.route('/')
@@ -11,6 +11,7 @@ router.route('/')
 router.route('/:thoughtId')
     .get(getThought)
     .put(updateThought)
+    .delete(deleteThought);
 
 // /api/thoughts/:thoughtId/reactions
 
