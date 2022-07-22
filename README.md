@@ -94,7 +94,13 @@ Project Description: `A Social Network API built w/ Node.js, Express.js, and Mon
 
 ![Application Image][application-image]
 
-TBA...
+NoSQL databases are widely used in real-time web applications and big data, because of their high scalability and high availability.
+
+NoSQL databases are also the preferred choice of many developers, as they naturally lend themselves to an agile development paradigm by rapidly adapting to changing requirements. NoSQL databases allow the data to be stored in ways that are more intuitive and easier to understand, or closer to the way the data is used by applications—with fewer transformations required when storing or retrieving using NoSQL-style APIs.
+
+This is an API for a social network web application where users can share their thoughts, react to friends’ thoughts, and create a friend list.
+
+It is built on Express.js and uses Mongoose to interact with a MongoDB database to perform RESTful CRUD Operations.
 
 
 <p align="right"> - <a href="#home">Return to Home</a></p>
