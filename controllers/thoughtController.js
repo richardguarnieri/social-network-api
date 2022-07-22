@@ -4,7 +4,7 @@ const { Thought, User } = require('./../models');
 const getThoughts = async (req, res) => {
     try {
         const thoughts = await Thought.find();
-        return thoughts.length ? res.status(200).json(thoughts) : res.status(500).json({success: false, message: 'no thoughts have been created...'})
+        res.status(200).json(thoughts);
     } catch (err) {
         res.status(500).json({success: false, message: 'something went wrong...', error: err.message})
     }
@@ -79,6 +79,7 @@ const postThoughtReaction = async (req, res) => {
     try {
         const { thoughtId } = req.params;
         if (thoughtId.length !== 24) {return res.status(400).json({success: false, message: `Provided ID ${thoughtId} is not a valid ID!`})}
+        // ******* instead of username should be userId, so we can look for the user and grab the username - better mechanics *******
         const { reactionBody, username } = req.body;
         if (!reactionBody || !username) {return res.status(400).json({success: false, message: `Empty request!`})}
         const thought = await Thought.findOne({_id: thoughtId});
@@ -95,8 +96,24 @@ const postThoughtReaction = async (req, res) => {
 };
 
 // DELETE to pull and remove a reaction by the reaction's reactionId value
-
+const deleteThoughtReaction = async (req, res) => {
+    try {
+        const { thoughtId, reactionId } = req.params;
+        if (thoughtId.length !== 24 || reactionId.length !== 24) {return res.status(400).json({success: false, message: `Provided IDs are not a valid IDs!`})}
+        const thought = await Thought.findOne({_id: thoughtId});
+        if (!thought) {return res.status(400).json({success: false, message: `Thought with ID ${thoughtId} does not exist!`})}
+        // check if reactionId is already included in the thought.reactions list - first have to map to extract the ids
+        const thoughtReactionsArray = thought.reactions.map(el => el._id.toString());
+        if (!thoughtReactionsArray.includes(reactionId)) {return res.status(400).json({success: false, message: `Reaction ID ${reactionId} does not exist in Thought ID ${thoughtId}!`})}
+        // filter out the reactionId from the thought.reactions array - toString() needed to convert from ObjectId to String to allow comparison
+        thought.reactions = thought.reactions.filter(reaction => reaction._id.toString() !== reactionId);
+        thought.save();
+        res.status(200).json({success: true, message: `Reaction ID ${reactionId} has been removed from Thought ID ${thoughtId}!`})
+    } catch (err) {
+        res.status(400).json({success: false, message: 'Something went wrong...', error: err.message})
+    }
+};
 
 module.exports = {
-    getThoughts, getThought, postThought, updateThought, deleteThought, postThoughtReaction
+    getThoughts, getThought, postThought, updateThought, deleteThought, postThoughtReaction, deleteThoughtReaction
 };
