@@ -14,7 +14,7 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
     try {
         const { userId } = req.params;
-        const user = await User.findOne({_id: userId}).populate('friends');
+        const user = await User.findOne({_id: userId}).populate(['thoughts', 'friends']);
         if (!user) {return res.status(400).json({success: false, message: `User with ID ${userId} does not exist!`})};
         res.status(200).json(user);
     } catch (err) {
