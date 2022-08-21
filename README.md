@@ -226,7 +226,7 @@ localhost:3001/api/thoughts/:thoughtId/reactions/:reactionId // delete a reactio
 
 The following video walkthrough explains how to use the app and each of its routes:
 
-[![Application Image](./img/video-thumbnail.png)](https://github.com/richardguarnieri/social-network-api)
+[![Application Image](./img/video-thumbnail.png)](https://youtu.be/tWPocs3ct9Y)
 
 _For more examples, please refer to the [Documentation][documentation-url]._
 
